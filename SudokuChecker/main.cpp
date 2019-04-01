@@ -61,6 +61,7 @@ vector<vector<cell>> readInData(string fileName) {
 bool isValid(cell _cell, vector<vector<cell>>& cells, int _row, int _col) {
 	// Starting by checking if the cell in questin contains a number 1-9
 	if (cells[_row][_col].num < 0 || cells[_row][_col].num > 9) {
+		cout << "Cell at [" << _row << "][" << _col << "] "<<  cells[_row][_col].num << " is not a number 1-9" << endl;
 		return false;
 	}
 	// Start at cell in question and check down the column for a match
@@ -70,6 +71,8 @@ bool isValid(cell _cell, vector<vector<cell>>& cells, int _row, int _col) {
 		}
 		// If a match is found in the column, the board is invalid
 		if (cells[row][_col].num == _cell.num) {
+			cout << "Cell at [" << row << "][" << _col << "] " << cells[_row][_col].num << " matches " << cells[_row][_col].num;
+			cout << " at [" << _row << "][" << _col << "] " << endl;
 			return false;
 		}
 	}
@@ -80,6 +83,8 @@ bool isValid(cell _cell, vector<vector<cell>>& cells, int _row, int _col) {
 		}
 		// If a match is found in the row, the board is invalid
 		if (cells[_row][col].num == _cell.num) {
+			cout << "Cell at [" << _row << "][" << col << "] " << cells[_row][_col].num << " matches " << cells[_row][_col].num;
+			cout << " at [" << _row << "][" << _col << "] " << endl;
 			return false;
 		}
 	}
@@ -92,6 +97,8 @@ bool isValid(cell _cell, vector<vector<cell>>& cells, int _row, int _col) {
 			}
 			// If a match is found in the square, the board is invalid
 			if (cells[row][col].num == _cell.num) {
+				cout << "Cell at [" << row << "][" << col << "] " << cells[_row][_col].num << " matches " << cells[_row][_col].num;
+				cout << " at [" << _row << "][" << _col << "] " << endl;
 				return false;
 			}
 		}
