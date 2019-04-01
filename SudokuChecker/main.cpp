@@ -176,7 +176,10 @@ void writeToCSV(vector<vector<cell>> cells, string fileName) {
 
 int main() {
 
-	string fileName = "sample1.csv";
+	cout << "Enter a sample csv file:	sample1.csv		sample2.csv		sample3.csv" << endl;
+	string fileName;
+	cin >> fileName;
+
 	string writeFile = "results.csv";
 	vector<vector<cell>> cells = readInData(fileName);
 	// Checking to see if each pre-filled cell is valid
@@ -185,7 +188,7 @@ int main() {
 			if (cells[row][col].preFilled) {
 				if (!isValid(cells[row][col], cells, row, col)) {
 					cout << "It's not a valid board! Same number found in row, column, or square!" << endl;
-					return 0;
+					return 1;
 				}
 			}
 		}
@@ -200,5 +203,7 @@ int main() {
 	}
 	cout << "It's a valid board! Check the excel spreadsheet for possible numbers in each cell!";
 	writeToCSV(cells, writeFile);
+
+	return 0;
 
 }
