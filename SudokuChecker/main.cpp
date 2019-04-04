@@ -21,6 +21,7 @@ struct cell {
 	bool preFilled;
 	int num;
 	squarePair square;
+	bool valid;
 };
 
 // This will read in the csv fild into a 9X9 2D vector
@@ -44,6 +45,8 @@ vector<vector<cell>> readInData(string fileName) {
 				retVector[row][col].preFilled = true;
 				retVector[row][col].square.x = (row / 3) * 3; // Labeling each square with their top left cells coordinates
 				retVector[row][col].square.y = (col / 3) * 3;
+				retVector[row][col].valid = true;
+
 			}
 			// There was no number in the cell
 			catch (invalid_argument e) {
@@ -51,6 +54,7 @@ vector<vector<cell>> readInData(string fileName) {
 				retVector[row][col].preFilled = false;
 				retVector[row][col].square.x = (row / 3) * 3;
 				retVector[row][col].square.y = (col / 3) * 3;
+				retVector[row][col].valid = true;
 			}
 		}
 	}
@@ -64,15 +68,18 @@ bool isValid(cell _cell, vector<vector<cell>>& cells, int _row, int _col) {
 		cout << "Cell at [" << _row << "][" << _col << "] "<<  cells[_row][_col].num << " is not a number 1-9" << endl;
 		return false;
 	}
-	// Start at cell in question and check down the column for a match
+	// Start at cell in question and traverse down the column looking for a match
 	for (int row = 0; row < 9; row++) {
 		if (row == _row) {
 			continue;
 		}
 		// If a match is found in the column, the board is invalid
 		if (cells[row][_col].num == _cell.num) {
+			cout << "It's not a valid board. Same number found in column --> ";
 			cout << "Cell at [" << row << "][" << _col << "] " << cells[_row][_col].num << " matches " << cells[_row][_col].num;
 			cout << " at [" << _row << "][" << _col << "] " << endl;
+			// A match was found. Board is now invalid
+			cells[row][_col].valid = false;
 			return false;
 		}
 	}
@@ -83,8 +90,11 @@ bool isValid(cell _cell, vector<vector<cell>>& cells, int _row, int _col) {
 		}
 		// If a match is found in the row, the board is invalid
 		if (cells[_row][col].num == _cell.num) {
+			cout << "It's not a valid board. Same number found in row    --> ";
 			cout << "Cell at [" << _row << "][" << col << "] " << cells[_row][_col].num << " matches " << cells[_row][_col].num;
 			cout << " at [" << _row << "][" << _col << "] " << endl;
+			// A match was found. Board is now invalid
+			cells[_row][col].valid = false;
 			return false;
 		}
 	}
@@ -97,8 +107,11 @@ bool isValid(cell _cell, vector<vector<cell>>& cells, int _row, int _col) {
 			}
 			// If a match is found in the square, the board is invalid
 			if (cells[row][col].num == _cell.num) {
+				cout << "It's not a valid board. Same number found in square --> ";
 				cout << "Cell at [" << row << "][" << col << "] " << cells[_row][_col].num << " matches " << cells[_row][_col].num;
 				cout << " at [" << _row << "][" << _col << "] " << endl;
+				// A match was found. Board is now invalid
+				cells[row][col].valid = false;
 				return false;
 			}
 		}
@@ -166,7 +179,12 @@ void writeToCSV(vector<vector<cell>> cells, string fileName) {
 	// The pre-filled cells will have an asterisk surround the number. i.e *8* was already in the cell
 	for (int row = 0; row < 9; row++) {
 		for (int col = 0; col < 9; col++) {
-			if (cells[row][col].preFilled) {
+			// Marking invalid cells with '!#!'
+			if (!cells[row][col].valid){ 
+				outfile << "!" << cells[row][col].num << "!" << ",";
+			}
+			// Marking valid cells with '*#*'
+			else if (cells[row][col].preFilled) {
 				outfile << "*" << cells[row][col].num << "*" << ",";
 			}
 			else {
@@ -187,28 +205,32 @@ int main() {
 	string fileName;
 	cin >> fileName;
 
-	string writeFile = "results.csv";
+	string writeFile = "results3.csv";
 	vector<vector<cell>> cells = readInData(fileName);
+	bool validBoard = true;
 	// Checking to see if each pre-filled cell is valid
 	for (int row = 0; row < 9; row++) {
 		for (int col = 0; col < 9; col++) {
 			if (cells[row][col].preFilled) {
 				if (!isValid(cells[row][col], cells, row, col)) {
-					cout << "It's not a valid board! Same number found in row, column, or square!" << endl;
-					return 1;
+					cells[row][col].valid = false;
+					validBoard = false;
 				}
 			}
 		}
 	}
-	// If the cell is not pre-filled, find the possible numbers
-	for (int row = 0; row < 9; row++) {
-		for (int col = 0; col < 9; col++) {
-			if (!cells[row][col].preFilled) {
-				cells[row][col].possibleNumbers = findPossibilites(cells[row][col], cells, row, col);
+	if(validBoard){
+		// If the cell is not pre-filled, find the possible numbers
+		for (int row = 0; row < 9; row++) {
+			for (int col = 0; col < 9; col++) {
+				if (!cells[row][col].preFilled) {
+					cells[row][col].possibleNumbers = findPossibilites(cells[row][col], cells, row, col);
+				}
 			}
 		}
+		cout << "It's a valid board! Check the excel spreadsheet for possible numbers in each cell!";
 	}
-	cout << "It's a valid board! Check the excel spreadsheet for possible numbers in each cell!";
+		
 	writeToCSV(cells, writeFile);
 
 	return 0;
